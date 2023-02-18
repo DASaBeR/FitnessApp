@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { Component, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-login',
@@ -7,4 +8,7 @@ import { Component } from '@angular/core';
 })
 export class LoginComponent {
 
-}
+  onSubmit(form: NgForm) {
+    console.log(form);
+  }
+ }
