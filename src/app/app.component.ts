@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
@@ -9,9 +9,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 export class AppComponent {
 
   title = 'FitnessApp';
-  @ViewChild("sidenav") sidenav!: MatSidenav;
+  //@ViewChild("sidenav") sidenav!: MatSidenav;
 
-  onToggle() {
-    this.sidenav.toggle();
-  }
+  
 }
