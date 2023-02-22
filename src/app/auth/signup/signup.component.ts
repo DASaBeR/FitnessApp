@@ -1,3 +1,4 @@
+import { AuthService } from './../auth.service';
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
@@ -8,8 +9,14 @@ import { NgForm } from '@angular/forms';
 })
 export class SignupComponent {
 
+  constructor(private authSerivce:AuthService) {}
   onSubmit(form: NgForm) {
-    console.log(form)
+    
+    this.authSerivce.registerUSer({
+      email: form.value.email,
+      password: form.value.password
+    });
   }
+
 
 }

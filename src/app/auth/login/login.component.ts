@@ -1,3 +1,4 @@
+import { AuthService } from './../auth.service';
 import { NgForm } from '@angular/forms';
 import { Component, ElementRef } from '@angular/core';
 
@@ -8,7 +9,11 @@ import { Component, ElementRef } from '@angular/core';
 })
 export class LoginComponent {
 
+  constructor(private authService:AuthService) {}
   onSubmit(form: NgForm) {
-    console.log(form);
+    this.authService.login({
+      email: form.value.email,
+      password: form.value.password,
+    });
   }
  }
