@@ -3,7 +3,8 @@
     <h1>{{progress}}%</h1>
     <p>You can do it . . .</p>
     <div fxLayoutGap="15px"  fxLayout="row">
-        <button fxFlex="100px"  mat-raised-button color="accent" (click)="onPause()">Pause</button>
+        <button *ngIf="isPaused" fxFlex="100px"  mat-raised-button color="accent" (click)="onPauseOrResume()">Resume</button>
+        <button *ngIf="!isPaused" fxFlex="100px"  mat-raised-button color="accent" (click)="onPauseOrResume()">Pause</button>
         <button fxFlex="100px" mat-raised-button color="warn" (click)="onStop()">Stop</button>       
     </div>
 </section>

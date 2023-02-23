@@ -1,3 +1,4 @@
+import { TrainingService } from './training/training.service';
 import { AuthService } from './auth/auth.service';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -41,7 +42,7 @@ import { StopTrainingComponent } from './training/current-training/stop-training
     FlexLayoutModule,
     FormsModule,
   ],
-  providers: [AuthService],
+  providers: [AuthService , TrainingService],
   bootstrap: [AppComponent],
   entryComponents: [StopTrainingComponent]
 })
