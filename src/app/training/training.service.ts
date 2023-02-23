@@ -41,4 +41,8 @@ export class TrainingService {
         this.runningTraining = null;
         this.trainingChanged.next(null);
     }
+
+    getCompletedOrCanceledTrainings(){
+        return this.trainings;
+    }
 }
