@@ -1,3 +1,4 @@
+import { environment } from '../enviroment/environment';
 import { TrainingService } from './training/training.service';
 import { AuthService } from './auth/auth.service';
 import { NgModule } from '@angular/core';
@@ -19,6 +20,11 @@ import { WelcomeComponent } from './welcome/welcome.component';
 import { HeaderComponent } from './navigation/header/header.component';
 import { SidenavListComponent } from './navigation/sidenav-list/sidenav-list.component';
 import { StopTrainingComponent } from './training/current-training/stop-training.component';
+import * as Parse from 'parse';
+
+Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY);
+(Parse as any).serverURL = environment.serverURL;
+
 
 @NgModule({
   declarations: [
