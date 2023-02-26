@@ -2,5 +2,6 @@ export const environment = {
     production: false,
     PARSE_APP_ID: 'dHpS0oQe76H1jWFCAjLWRjVygJIloLvpYAg8LCQe',
     PARSE_JS_KEY: 'dbZcmUTce4eBJuAjrO3oItGPtL4HYkbzDom171R3',
-    serverURL: 'https://parseapi.back4app.com'
+    serverURL: 'https://parseapi.back4app.com',
+    serverLiveQueryURL: 'https://fitnessapp12my.b4a.io'
   };

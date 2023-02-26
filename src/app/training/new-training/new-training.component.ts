@@ -1,5 +1,5 @@
 import { NgForm } from '@angular/forms';
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { Exercise } from '../exercise.model';
 import { TrainingService } from './../training.service';
 @Component({
@@ -7,13 +7,17 @@ import { TrainingService } from './../training.service';
   templateUrl: './new-training.component.html',
   styleUrls: ['./new-training.component.css']
 })
-export class NewTrainingComponent implements OnInit {
+export class NewTrainingComponent implements OnInit, OnDestroy {
   
   trainings : Exercise [] = [];
 
   constructor(private trainingService: TrainingService) {}
+
+  ngOnDestroy(): void {
+    this.trainingService.unsubscribeLiveQuery();
+  }
   ngOnInit(): void {
-    this.trainingService.getAvailabelExercises().then((trainings) => {
+    this.trainingService.fetchAvailabelExercises().then((trainings) => {
       this.trainings = trainings;
     });
   }
