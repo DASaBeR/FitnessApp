@@ -14,7 +14,7 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   constructor(private trainingService: TrainingService) {}
 
   ngOnDestroy(): void {
-    this.trainingService.unsubscribeLiveQuery();
+    this.trainingService.unsubscribeLiveQueries();
   }
   ngOnInit(): void {
     this.trainingService.fetchAvailabelExercises().then((trainings) => {

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { TrainingService } from './../training.service';
@@ -11,7 +11,7 @@ import { MatPaginator } from '@angular/material/paginator';
   templateUrl: './past-training.component.html',
   styleUrls: ['./past-training.component.css']
 })
-export class PastTrainingComponent implements OnInit, AfterViewInit {
+export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: string[] = ["date" , "name" , "calories" , "duration" , "state"]
   dataSource = new MatTableDataSource<Exercise>();
@@ -20,6 +20,9 @@ export class PastTrainingComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(private trainingService:TrainingService) {}
+  ngOnDestroy(): void {
+    this.trainingService.unsubscribeLiveQueries();
+  }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
@@ -27,7 +30,9 @@ export class PastTrainingComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.dataSource.data = this.trainingService.getCompletedOrCanceledTrainings();
+    this.trainingService.fetchCompletedOrCanceledTrainings().then(exersices => {
+      this.dataSource.data = exersices;
+    });
   }
 
   doFilter(filterValue: any) {

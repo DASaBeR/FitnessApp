@@ -7,7 +7,8 @@ import { Exercise } from "./exercise.model";
 export class TrainingService {
     trainingChanged = new Subject<Exercise>();
     private runningTraining: Exercise;
-    private trainings: Exercise[] = [];
+    private finishedExercise: Exercise[] = [];
+    private subscriptions: Promise<Parse.LiveQuerySubscription>[] = [];
     private subscription: Promise<Parse.LiveQuerySubscription>;
     private availabelExercises: Exercise[] = [];
 
@@ -20,6 +21,8 @@ export class TrainingService {
 
         //for LiveQuery we need to subscrbe the query  ==> https://docs.parseplatform.org/js/guide/#live-queries
         this.subscription = query.subscribe();
+
+        this.subscriptions.push(this.subscription); //  <== store all subscriptions in an array to unsubscrib all of them in component.
 
         (await this.subscription).on("open", async () => {
             const exer = await query.find();
@@ -74,13 +77,13 @@ export class TrainingService {
     }
 
     completeTraining() {
-        this.trainings.push({ ...this.runningTraining, date: new Date(), state: "completed" });
+        this.addDataToDatabase({ ...this.runningTraining, date: new Date(), state: "completed" });
         this.runningTraining = null;
         this.trainingChanged.next(null);
     }
 
     cancelTraining(progress: number) {
-        this.trainings.push({
+        this.addDataToDatabase({
             ...this.runningTraining,
             duration: this.runningTraining.duration * (progress / 100),
             calories: this.runningTraining.calories * (progress / 100),
@@ -90,12 +93,82 @@ export class TrainingService {
         this.trainingChanged.next(null);
     }
 
-    getCompletedOrCanceledTrainings() {
-        return this.trainings;
+    async fetchCompletedOrCanceledTrainings() {
+        this.finishedExercise = [];
+        (Parse as any).serverURL = environment.serverLiveQueryURL;
+        const Exercises = Parse.Object.extend("finishedExercises");
+        const query = new Parse.Query(Exercises);
+
+        //for LiveQuery we need to subscrbe the query  ==> https://docs.parseplatform.org/js/guide/#live-queries
+        this.subscription = query.subscribe();
+
+        this.subscriptions.push(this.subscription); //  <== store all subscriptions in an array to unsubscrib all of them in component.
+
+        const exer = await query.find();
+        for (let i = 0; i < exer.length; i++) {
+            this.finishedExercise.push({
+                id: exer[i]["id"],
+                name: exer[i].attributes["name"],
+                duration: exer[i].attributes["duration"],
+                calories: exer[i].attributes["calories"],
+                date: exer[i].attributes["createdAt"],
+                state: exer[i].attributes["state"]
+            });
+        }
+
+        // Real Time (LiveQuery) if data change in sever(Back4App database) it will update automaticly in app.
+        (await this.subscription).on("update", (result) => {
+            var updatedExercise = this.finishedExercise.find(x => x.id === result["id"]);
+            updatedExercise.name = result.attributes["name"];
+            updatedExercise.duration = result.attributes["duration"];
+            updatedExercise.calories = result.attributes["calories"];
+            updatedExercise.calories = result.attributes["createdAt"];
+            updatedExercise.state = result.attributes["state"];
+
+            console.log(result.attributes["name"] + " Updated in database . . .");
+        });
+
+        (await this.subscription).on("delete", (result) => {
+            var Exercise = this.finishedExercise.find(x => x.id === result["id"]);
+            var indexOfExercise = this.finishedExercise.indexOf(Exercise, 0);
+            this.finishedExercise.splice(indexOfExercise);
+
+            console.log(result.attributes["name"] + " Deleted from database . . .");
+        });
+
+        (await this.subscription).on("create", (result) => {
+            this.finishedExercise.push({
+                id: result["id"],
+                name: result.attributes["name"],
+                duration: result.attributes["duration"],
+                calories: result.attributes["calories"],
+                date: result.attributes["createdAt"],
+                state: result.attributes["state"]
+            });
+            console.log(result.attributes["name"] + " Created in database . . .");
+        });
+        (Parse as any).serverURL = environment.serverURL;
+        return this.finishedExercise;
     }
 
-    async unsubscribeLiveQuery() {
-        (await this.subscription).unsubscribe();
+    async unsubscribeLiveQueries() {
+        if (this.subscriptions) {
+            this.subscriptions.forEach(async (sub) => {
+                (await sub).unsubscribe();
+            });
+        }
         (Parse as any).serverURL = environment.serverURL;
+    }
+
+    async addDataToDatabase(exercise: Exercise) {
+        const finishedExerciseObject = Parse.Object.extend("finishedExercises");
+        const finishedExercise = new finishedExerciseObject();
+        finishedExercise.set("typeId", exercise.id);
+        finishedExercise.set("name", exercise.name);
+        finishedExercise.set("state", exercise.state);
+        finishedExercise.set("duration", exercise.duration);
+        finishedExercise.set("calories", exercise.calories);
+
+        finishedExercise.save();
     }
 }
