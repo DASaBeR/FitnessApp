@@ -12,7 +12,7 @@ export class SignupComponent {
   constructor(private authSerivce:AuthService) {}
   onSubmit(form: NgForm) {
     
-    this.authSerivce.registerUSer({
+    this.authSerivce.registerUser({
       email: form.value.email,
       password: form.value.password
     });

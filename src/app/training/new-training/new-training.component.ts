@@ -19,7 +19,7 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.trainingService.fetchAvailabelExercises().then((trainings) => {
       this.trainings = trainings;
-    });
+    }).catch(er => {});
   }
 
   onStartTraining(form:NgForm) {

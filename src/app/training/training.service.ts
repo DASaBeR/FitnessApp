@@ -25,15 +25,18 @@ export class TrainingService {
         this.subscriptions.push(this.subscription); //  <== store all subscriptions in an array to unsubscrib all of them in component.
 
         (await this.subscription).on("open", async () => {
-            const exer = await query.find();
-            for (let i = 0; i < exer.length; i++) {
-                this.availabelExercises.push({
-                    id: exer[i]["id"],
-                    name: exer[i].attributes["name"],
-                    duration: exer[i].attributes["duration"],
-                    calories: exer[i].attributes["calories"]
-                });
+            const exer = await query.find().catch(er => {});
+            if (exer) {
+                for (let i = 0; i < exer.length; i++) {
+                    this.availabelExercises.push({
+                        id: exer[i]["id"],
+                        name: exer[i].attributes["name"],
+                        duration: exer[i].attributes["duration"],
+                        calories: exer[i].attributes["calories"]
+                    });
+                }
             }
+
             console.log(" Start Conection Query . . .");
         });
 

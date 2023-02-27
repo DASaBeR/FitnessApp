@@ -32,7 +32,7 @@ export class PastTrainingComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.trainingService.fetchCompletedOrCanceledTrainings().then(exersices => {
       this.dataSource.data = exersices;
-    });
+    }).catch(er => {});
   }
 
   doFilter(filterValue: any) {
