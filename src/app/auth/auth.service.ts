@@ -1,12 +1,13 @@
-import { TrainingService } from './../training/training.service';
-import { User } from "./user.model";
-import { Guid } from 'guid-typescript';
 import { Subject } from "rxjs";
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import * as Parse from "parse";
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthData } from './auth-data.model';
+import { TrainingService } from './../training/training.service';
+import { User } from "./user.model";
+import { UIService } from './../shared/ui.service';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,12 @@ export class AuthService {
     private isAthenticated: boolean = false;
     authChange = new Subject<boolean>();
 
-    constructor(private router: Router, private trainingService:TrainingService) { }
+    constructor(
+        private router: Router,
+        private trainingService:TrainingService,
+        private snackbar: MatSnackBar,
+        private uiService:UIService,
+        ) { }
 
     AuthListener() {
         const user = Parse.User.current();
@@ -32,28 +38,36 @@ export class AuthService {
     }
 
     registerUser(authData: AuthData) {
+        this.uiService.loadingStateChanged.next(true);
         var user = new Parse.User();
         user.set("username", authData.email);
         user.set("password", authData.password);
         user.set("email", authData.email);
 
         user.signUp().then((user) => {
-            //console.log('User created in successful with name: ' + user.get("username") + ' and email: ' + user.get("email"));
+            this.uiService.loadingStateChanged.next(false);
             this.AuthListener();
         }).catch(error => {
-            //console.log("SignUp Error: " + error.code + " " + error.message);
+            this.uiService.loadingStateChanged.next(false);
+            this.snackbar.open(error.message , null , {
+                duration: 3000
+            });
         });
 
     }
 
 
     login(authData: AuthData) {
+        this.uiService.loadingStateChanged.next(true);
         var user = Parse.User
             .logIn(authData.email, authData.password).then((user) => {
-                //console.log('User loged in successful with name: ' + user.get("username") + ' and email: ' + user.get("email"));
+                this.uiService.loadingStateChanged.next(false);
                 this.AuthListener();
-            }).catch(function (error) {
-                //console.log("Login Error: " + error.code + " " + error.message);
+            }).catch(error => {
+                this.uiService.loadingStateChanged.next(false);
+                this.snackbar.open(error.message, null, {
+                    duration: 3000
+                });
             });
     }
 

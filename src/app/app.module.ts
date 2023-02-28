@@ -1,3 +1,4 @@
+import { UIService } from './shared/ui.service';
 import { environment } from '../enviroment/environment';
 import { TrainingService } from './training/training.service';
 import { AuthService } from './auth/auth.service';
@@ -48,7 +49,7 @@ Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY);
     FlexLayoutModule,
     FormsModule,
   ],
-  providers: [AuthService , TrainingService],
+  providers: [AuthService , TrainingService, UIService],
   bootstrap: [AppComponent],
   entryComponents: [StopTrainingComponent]
 })
