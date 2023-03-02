@@ -1,9 +1,12 @@
+import { Injectable } from '@angular/core';
+import { UIService } from './../shared/ui.service';
 import { environment } from './../../enviroment/environment';
 import { Subject } from 'rxjs';
 import * as Parse from 'parse';
 
 import { Exercise } from "./exercise.model";
 
+@Injectable()
 export class TrainingService {
     trainingChanged = new Subject<Exercise>();
     private runningTraining: Exercise;
@@ -11,6 +14,8 @@ export class TrainingService {
     private subscriptions: Promise<Parse.LiveQuerySubscription>[] = [];
     private subscription: Promise<Parse.LiveQuerySubscription>;
     private availabelExercises: Exercise[] = [];
+
+    constructor(private uiService: UIService) { }
 
     async fetchAvailabelExercises() {
         // How to Read Data from Back4App.com  ==> https://docs.parseplatform.org/js/guide/#queries
@@ -23,22 +28,19 @@ export class TrainingService {
         this.subscription = query.subscribe();
 
         this.subscriptions.push(this.subscription); //  <== store all subscriptions in an array to unsubscrib all of them in component.
-
-        (await this.subscription).on("open", async () => {
-            const exer = await query.find().catch(er => {});
-            if (exer) {
-                for (let i = 0; i < exer.length; i++) {
-                    this.availabelExercises.push({
-                        id: exer[i]["id"],
-                        name: exer[i].attributes["name"],
-                        duration: exer[i].attributes["duration"],
-                        calories: exer[i].attributes["calories"]
-                    });
-                }
-            }
-
-            console.log(" Start Conection Query . . .");
+        const exer = await query.find().catch(error => {
+            this.uiService.showSnackbar("Fetching Exercises failed, please try again later.", null, 3000);
         });
+        if (exer) {
+            for (let i = 0; i < exer.length; i++) {
+                this.availabelExercises.push({
+                    id: exer[i]["id"],
+                    name: exer[i].attributes["name"],
+                    duration: exer[i].attributes["duration"],
+                    calories: exer[i].attributes["calories"]
+                });
+            }
+        }
 
         // Real Time (LiveQuery) if data change in sever(Back4App database) it will update automaticly in app.
         (await this.subscription).on("update", (result) => {
@@ -107,16 +109,20 @@ export class TrainingService {
 
         this.subscriptions.push(this.subscription); //  <== store all subscriptions in an array to unsubscrib all of them in component.
 
-        const exer = await query.find();
-        for (let i = 0; i < exer.length; i++) {
-            this.finishedExercise.push({
-                id: exer[i]["id"],
-                name: exer[i].attributes["name"],
-                duration: exer[i].attributes["duration"],
-                calories: exer[i].attributes["calories"],
-                date: exer[i].attributes["createdAt"],
-                state: exer[i].attributes["state"]
-            });
+        const exer = await query.find().catch(() => {
+            this.uiService.showSnackbar("Fetching Exercises failed, please try again later.", null, 3000);
+        });
+        if (exer) {
+            for (let i = 0; i < exer.length; i++) {
+                this.finishedExercise.push({
+                    id: exer[i]["id"],
+                    name: exer[i].attributes["name"],
+                    duration: exer[i].attributes["duration"],
+                    calories: exer[i].attributes["calories"],
+                    date: exer[i].attributes["createdAt"],
+                    state: exer[i].attributes["state"]
+                });
+            }
         }
 
         // Real Time (LiveQuery) if data change in sever(Back4App database) it will update automaticly in app.
