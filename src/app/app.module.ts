@@ -16,7 +16,6 @@ import { MaterialModule } from './material.module';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { HeaderComponent } from './navigation/header/header.component';
 import { SidenavListComponent } from './navigation/sidenav-list/sidenav-list.component';
-import { TrainingModule } from './training/training.module';
 
 
 Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY);
@@ -38,7 +37,6 @@ Parse.initialize(environment.PARSE_APP_ID, environment.PARSE_JS_KEY);
     FlexLayoutModule,
     FormsModule,
     AuthModule,
-    TrainingModule
   ],
   providers: [AuthService , TrainingService, UIService],
   bootstrap: [AppComponent],
