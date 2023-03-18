@@ -10,6 +10,7 @@
             <li *ngIf="!isUserLogin"><a routerLink="/signup">SignUp</a></li>
             <li *ngIf="!isUserLogin"><a routerLink="/login">Login</a></li>
             <li><a routerLink="/training">Training</a></li>
+            <li><a routerLink="/steam">Steam</a></li>
             <li style="cursor: pointer;" *ngIf="isUserLogin"><a (click)="onLogout()">Logout</a></li>
         </ul>                
     </div>
